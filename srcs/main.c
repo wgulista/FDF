@@ -1,45 +1,59 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: wgulista <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2016/07/12 16:13:39 by wgulista          #+#    #+#             */
+/*   Updated: 2016/07/12 16:14:01 by wgulista         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/fdf.h"
 
-void		init_point(t_point *point)
+static t_env		*parse_map(char *file, t_env **e)
 {
-	point->x = 0;
-	point->y = 0;
-	point->color = 0;
-	//point->next = NULL;
+	t_line			*head;
+	char			*line;
+	int				fd;
+
+	line = NULL;
+	head = NULL;
+	if ((fd = open(file, O_RDONLY)) < 0)
+	{
+		ft_putstr(file);
+		ft_malloc_error(" - Filename could not open !");
+	}
+	while (get_next_line(fd, &line) > 0)
+	{
+		line_push_back(&head, new_line(line));
+		line = NULL;
+		(*e)->nb_line++;
+	}
+	*e = initpoints(*e, &head);
+	if (close(fd) == -1)
+		ft_malloc_error("Close file failed !");
+	return (*e);
 }
 
-void		init_env(t_env *env)
+int					main(int ac, char **av)
 {
-	env->mlx = mlx_init();
-	env->width = 500;
-	env->height = 500;
-	env->title = "Fil de fer";
-	env->win = mlx_new_window(env->mlx, env->width, env->height, env->title);
-	if (!env->win)
-	{
-		mlx_clear_window(env->mlx, env->win);
-		mlx_destroy_window(env->mlx, env->win);
-	}
-}
+	t_env			*e;
 
-int			main()
-{
-	t_env		env;
-	t_point 	point;
-
-	init_env(&env);
-	init_point(&point);
-	point.x = 50;
-	while (point.x < 100)
+	if (ac == 2)
 	{
-		point.y = 50;
-		while (point.y < 100)
-		{
-			point.color = 0x00FF00FF;
-			mlx_pixel_put(env.mlx, env.win, point.x, point.y, point.color);
-			point.y++;
-		}
-		point.x++;
+		if (!(e = (t_env*)malloc(sizeof(t_env))))
+			ft_malloc_error("Memory allocation for ENV failed !");
+		if (!(e = init_env()))
+			ft_malloc_error("EXIT_FAILURE");
+		parse_map(av[1], &e);
+		mlx_expose_hook(e->win, expose_hook, e);
+		mlx_hook(e->win, 2, 3, keyhook, e);
+		mlx_loop(e->mlx);
+		delete_env(e);
 	}
-	mlx_loop(env.mlx);
+	else
+		ft_usage_error();
+	return (0);
 }

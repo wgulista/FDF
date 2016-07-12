@@ -1,16 +1,30 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: wgulista <marvin@42.fr>                    +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2016/07/12 16:11:57 by wgulista          #+#    #+#              #
+#    Updated: 2016/07/12 16:12:00 by wgulista         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 .PHONY: all, clean, fclean, re
 
 NAME = fdf
 LIBFT = libft.a
 MINILIBX = minilibx.a
-SRC_NAME = 	main.c
+SRC_NAME = main.c hook.c helpers.c init_env.c errors.c move.c line.c \
+			zoom.c math.c algo_bresenham.c projection.c splitter.c point.c
 OBJ_PATH = obj
 SRC_PATH = srcs
 
 CFLAGS = -Wall -Wextra -Werror
 
 OBJ = $(addprefix $(OBJ_PATH)/, $(SRC_NAME:.c=.o))
-LIBX = -lm -L libft/ -lft -L/usr/local/lib/ -I/usr/local/include -lmlx -framework OpenGL -framework AppKit
+LIBX = -lm -L libft/ -lft -I/usr/local/include -I/usr/local/lib \
+	   -Lminilibx/ -lmlx -framework OpenGL -framework AppKit
 
 all: $(NAME)
 
@@ -28,6 +42,14 @@ $(addprefix $(OBJ_PATH)/, %.o): $(addprefix $(SRC_PATH)/, %.c)
 		@mkdir -p $(OBJ_PATH)
 		@gcc $(CFLAGS) -o $@ -c $^
 		@echo "\033[33mLinking" [ $< ] "\033[0m"
+
+norme:
+	@echo "\033[33mNorme LIBFT\033[0m"
+	@norminette ./libft/*
+	@echo "\n\033[33mNorme includes/fdf.h\033[0m"
+	@norminette ./includes/fdf.h
+	@echo "\n\033[33mNorme sources FDF\033[0m"
+	@norminette ./srcs
 
 clean:
 		@rm -fv $(OBJ)

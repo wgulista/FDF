@@ -14,8 +14,17 @@
 # define LIBFT_H
 # include <stdlib.h>
 # include <unistd.h>
+# include <fcntl.h>
 
-# define BUFF_SIZE 32
+# define BUFF_SIZE 4086
+
+typedef struct		s_gnl
+{
+	char			*save;
+	char			*buff;
+	char			*tmp;
+	int				rd;
+}					t_gnl;
 
 typedef struct		s_list
 {
@@ -92,6 +101,6 @@ void				ft_lstiter(t_list *lst, void (*f)(t_list *elem));
 t_list				*ft_lstmap(t_list *lst, t_list *(*f)(t_list *elem));
 void				ft_lstswap(t_list *a, t_list *b);
 
-int					get_next_line(int const fd, char **line);
+int					get_next_line(const int fd, char **line);
 
 #endif
